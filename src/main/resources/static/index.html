@@ -12,15 +12,36 @@
     <h2>Sorry! Your browser doesn't support Javascript</h2>
 </noscript>
 
-<div id="username-page">
+<div id="username-page" >
     <div class="username-page-container">
         <h1 class="title">Type your username</h1>
         <form id="usernameForm" name="usernameForm">
             <div class="form-group">
+                <span id="login_failed"></span>
                 <input type="text" id="name" placeholder="Username" autocomplete="off" class="form-control" />
+                <input type="text" id="password" placeholder="Password" autocomplete="off" class="form-control" />
+
             </div>
             <div class="form-group">
                 <button type="submit" class="accent username-submit">Start Chatting</button>
+                <button type="button" onclick="transfer()" class="accent username-submit">Register</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="register-page" class="hidden">
+    <div class="register-page-container">
+        <h1 class="title">Make an account</h1>
+        <form id="registerForm" name="registerForm">
+            <div class="form-group">
+
+                <input type="text" id="user" placeholder="Username" autocomplete="off" class="form-control" />
+                <input type="text" id="pass" placeholder="Password" autocomplete="off" class="form-control" />
+                <input type="text" id="conPass" placeholder="Confirm Password" autocomplete="off" class="form-control" />
+            </div>
+            <div class="form-group">
+                <span id="password_fail"></span>
+                <button type="submit" class="accent register-submit">Create</button>
             </div>
         </form>
     </div>
@@ -47,6 +68,63 @@
         </form>
     </div>
 </div>
+
+
+<script>
+    class User{
+        constructor(id_,username_,passw_){
+            this.id=id_;
+            this.userName=username_;
+            this.passWord=passw_;
+        }
+    }
+
+    let userName =document.getElementById("user").value;
+    let passWord =document.getElementById("pass").value;
+    let conPass =document.getElementById("conPass").value;
+    let jsonUser =new User(0,userName,passWord);
+
+    function submitClick(event) {
+        event.preventDefault();
+
+        let userName =document.getElementById("user").value;
+        let passWord =document.getElementById("pass").value;
+        let conPass =document.getElementById("conPass").value;
+        let jsonUser =new User(0,userName,passWord);
+        let endpoint ="http://localhost:8080/api/user-controller/create";
+        let userData = JSON.stringify(jsonUser)
+
+        var checkPass = false;  /* set this to true if the login was a success */
+        if(passWord == conPass){checkPass = true;}
+        if(checkPass == false)
+        {
+            document.getElementById("password_fail").innerHTML = "Passwords did not match";
+        }
+        else
+        {
+        registerPage.classList.add('hidden');
+    usernamePage.classList.remove('hidden');
+                    $.ajax({
+            type: "POST",
+            url:endpoint,
+            data: userData,
+            dataType: "JSON",
+            headers:{
+                'Accept':'application/json',
+                'Content-Type':'application/json',
+                'Access-Control-Allow-Origin':'*'
+            },
+            success: function(response){
+                alert(JSON.stringify(response));
+            },
+            error: function(){
+                alert('Error while request...');
+            }
+        });
+        }
+
+    }
+</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>

@@ -3,11 +3,13 @@ package com.github.fjern.ChatApp.Service;
 import com.github.fjern.ChatApp.model.User;
 import com.github.fjern.ChatApp.repositroy.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class UserService {
     private UserRepository repository;
 
@@ -16,8 +18,8 @@ public class UserService {
         this.repository = repository;
     }
 
-    public User create(User person) {
-        User userCreated = repository.save(person);
+    public User create(User user) {
+        User userCreated = repository.save(user);
         return userCreated;
     }
 
@@ -48,5 +50,16 @@ public class UserService {
         List<User> userList = new ArrayList<>();
         repository.findAll().forEach(userList::add);
         return userList;
+    }
+
+    public Boolean validateLogin(User user) {
+        List<User> allUsers = readAll();
+
+        for(User userInDB : allUsers){
+            if(userInDB.getUserName().equals(user.getUserName()) && userInDB.getPassWord().equals(user.getPassWord())){
+                return true;
+            }
+        }
+        return false;
     }
 }

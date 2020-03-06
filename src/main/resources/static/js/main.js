@@ -3,10 +3,12 @@
 var usernamePage = document.querySelector('#username-page');
 var chatPage = document.querySelector('#chat-page');
 var usernameForm = document.querySelector('#usernameForm');
+var registerForm = document.querySelector('#registerForm');
 var messageForm = document.querySelector('#messageForm');
 var messageInput = document.querySelector('#message');
 var messageArea = document.querySelector('#messageArea');
 var connectingElement = document.querySelector('.connecting');
+var registerPage = document.querySelector('#register-page')
 
 var stompClient = null;
 var username = null;
@@ -17,9 +19,13 @@ var colors = [
 ];
 
 function connect(event) {
-    username = document.querySelector('#name').value.trim();
-
-    if(username) {
+//    event.preventDefault();
+//    username = document.querySelector('#name').value.trim();
+//
+//    let loginSuccess = await checkUser();
+//    console.log(loginSuccess)
+//    if(loginSuccess){
+//    if(username) {
         usernamePage.classList.add('hidden');
         chatPage.classList.remove('hidden');
 
@@ -27,10 +33,45 @@ function connect(event) {
         stompClient = Stomp.over(socket);
 
         stompClient.connect({}, onConnected, onError);
-    }
-    event.preventDefault();
+//    }
 }
 
+
+async function checkUser(event){
+    event.preventDefault();
+
+    username = document.querySelector('#name').value.trim();
+    let password = document.querySelector('#password').value.trim();
+
+    console.log(username);
+            let jsonUser =new User(0,username,password);
+        let userData = JSON.stringify(jsonUser)
+
+    let endpoint = "http://localhost:8080/api/user-controller/login"
+            $.ajax({
+                type: "POST",
+                url:endpoint,
+                data: userData,
+                dataType: "JSON",
+                headers:{
+                    'Accept':'application/json',
+                    'Content-Type':'application/json',
+                    'Access-Control-Allow-Origin':'*'
+                },
+                success: function(response){
+                    if(response){
+                        connect();
+                    }
+                    return response;
+                },
+                error: function(){
+                console.log("err")
+                    return false;
+                }
+                })
+
+
+}
 
 function onConnected() {
     // Subscribe to the Public Topic
@@ -113,6 +154,16 @@ function getAvatarColor(messageSender) {
     var index = Math.abs(hash % colors.length);
     return colors[index];
 }
+function transfer(){
+    usernamePage.classList.add('hidden');
+    registerPage.classList.remove('hidden');
 
-usernameForm.addEventListener('submit', connect, true)
+}
+function register(){
+    registerPage.classList.add('hidden');
+    usernamePage.classList.remove('hidden');
+}
+
+registerForm.addEventListener('submit', submitClick,true)
+usernameForm.addEventListener('submit', checkUser, true)
 messageForm.addEventListener('submit', sendMessage, true)

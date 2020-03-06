@@ -17,10 +17,10 @@ public class User {
 
     }
 
-    public User(Long id, String firstName, String lastName) {
+    public User(Long id, String userName, String passWord) {
         this.id = id;
-        this.userName = firstName;
-        this.passWord = lastName;
+        this.userName = userName;
+        this.passWord = passWord;
     }
 
     public Long getId() {
